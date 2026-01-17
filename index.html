@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Smart ECG Monitoring System</title>
 
+    <!-- CSS CODE -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -64,6 +65,7 @@
 
 <body>
 
+<!-- HTML CODE -->
 <header>
     <h1>Smart ECG Monitoring System</h1>
     <p>Final Year Project - Raspberry Pi 5</p>
@@ -96,8 +98,9 @@
 
 </div>
 
+<!-- JAVASCRIPT CODE -->
 <script>
-    // Sample patient data
+    // Sample patient data (Demo data)
     const patients = [
         { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
         { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
@@ -110,7 +113,6 @@
         { name: "Sathya", phone: "9790493422", age: 21, gender: "Female" },
         { name: "Bharath Kumar", phone: "8610644691", age: 21, gender: "Male" }
     ];
-</script>
 
     function searchPatient() {
         const nameInput = document.getElementById("name").value.toLowerCase();
@@ -146,7 +148,7 @@
 
         for (let x = 0; x < canvas.width; x++) {
             let y = 100 + Math.sin(x * 0.05) * 30;
-            if (x % 120 === 0) y = 30; // ECG spike
+            if (x % 120 === 0) y = 30; // ECG spike simulation
             ctx.lineTo(x, y);
         }
 
