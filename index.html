@@ -1,84 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Smart ECG Monitoring System</title>
+<meta charset="UTF-8">
+<title>Smart ECG Monitoring System</title>
 
-    <!-- CSS CODE -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+body {
+    background: #f4f4f4;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
 
-        header {
-            background-color: #0a4d8c;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
+header {
+    background: #0a4d8c;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
 
-        .container {
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-        }
+.container {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 20px;
+}
 
-        .box {
-            background: white;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+.box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
 
-        input {
-            padding: 10px;
-            width: 45%;
-            margin: 5px 0;
-        }
+input {
+    padding: 10px;
+    width: 250px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
 
-        button {
-            padding: 10px 20px;
-            background-color: #0a4d8c;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+button {
+    padding: 10px 20px;
+    background: #0a4d8c;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
 
-        button:hover {
-            background-color: #083c6d;
-        }
+button:hover {
+    background: #083c6d;
+}
 
-        canvas {
-            border: 1px solid #ccc;
-            margin-top: 10px;
-        }
+.hidden {
+    display: none;
+}
 
-        .hidden {
-            display: none;
-        }
-    </style>
+canvas {
+    background: white;
+    border: 2px solid #333;
+    margin: 20px auto;
+    display: block;
+}
+</style>
 </head>
 
 <body>
 
-<!-- HTML CODE -->
-
 <header>
-    <h1>Smart ECG Monitoring System</h1>
-    <p>Final Year Project - Raspberry Pi 5</p>
+    Smart ECG Monitoring System – Raspberry Pi 5
 </header>
 
 <div class="container">
 
-    <!-- Search Section -->
+    <!-- Search -->
     <div class="box">
         <h3>Search Patient</h3>
         <input type="text" id="name" placeholder="Enter Patient Name">
-        <input type="text" id="phone" placeholder="Enter Phone Number"><br><br>
+        <input type="text" id="phone" placeholder="Enter Phone Number">
         <button onclick="searchPatient()">Search</button>
     </div>
 
@@ -91,74 +93,118 @@
         <p><b>Gender:</b> <span id="pgender"></span></p>
     </div>
 
-    <!-- ECG Graph -->
+    <!-- ECG -->
     <div class="box hidden" id="ecgBox">
-        <h3>ECG Output</h3>
-        <canvas id="ecgCanvas" width="800" height="200"></canvas>
+        <h3>ECG Output (P-Q-R-S-T Complex)</h3>
+        <canvas id="ecgCanvas" width="1000" height="350"></canvas>
     </div>
 
 </div>
 
-<!-- JAVASCRIPT CODE -->
 <script>
+const patients = [
+    { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
+    { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
+    { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" }
+];
 
-    // Sample patient data (Demo data)
-    const patients = [
-        { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
-        { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
-        { name: "Karthick Prabhu", phone: "6380383481", age: 21, gender: "Male" },
-        { name: "Premnath", phone: "8778405776", age: 21, gender: "Male" },
-        { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" },
-        { name: "Roopashree", phone: "8610348470", age: 21, gender: "Female" },
-        { name: "Gowtham", phone: "6379267706", age: 21, gender: "Male" },
-        { name: "Priya", phone: "6381357576", age: 21, gender: "Female" },
-        { name: "Sathya", phone: "9790493422", age: 21, gender: "Female" },
-        { name: "Bharath Kumar", phone: "8610644691", age: 21, gender: "Male" }
-    ];
+function searchPatient() {
+    const name = document.getElementById("name").value.toLowerCase();
+    const phone = document.getElementById("phone").value;
 
-    function searchPatient() {
-        const nameInput = document.getElementById("name").value.toLowerCase();
-        const phoneInput = document.getElementById("phone").value;
+    let found = patients.find(p =>
+        p.name.toLowerCase().includes(name) || p.phone.includes(phone)
+    );
 
-        let found = patients.find(p =>
-            p.name.toLowerCase().includes(nameInput) ||
-            p.phone.includes(phoneInput)
-        );
-
-        if (found) {
-            document.getElementById("patientBox").classList.remove("hidden");
-            document.getElementById("ecgBox").classList.remove("hidden");
-
-            document.getElementById("pname").innerText = found.name;
-            document.getElementById("pphone").innerText = found.phone;
-            document.getElementById("page").innerText = found.age;
-            document.getElementById("pgender").innerText = found.gender;
-
-            drawECG();
-        } else {
-            alert("Patient not found");
-        }
+    if (!found) {
+        alert("Patient not found");
+        return;
     }
 
-    function drawECG() {
-        const canvas = document.getElementById("ecgCanvas");
-        const ctx = canvas.getContext("2d");
+    patientBox.classList.remove("hidden");
+    ecgBox.classList.remove("hidden");
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pname.innerText = found.name;
+    pphone.innerText = found.phone;
+    page.innerText = found.age;
+    pgender.innerText = found.gender;
+
+    drawECG();
+}
+
+function drawECG() {
+    const canvas = document.getElementById("ecgCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const centerY = 170;
+    const startX = 50;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Grid
+    ctx.strokeStyle = "#e0e0e0";
+    for (let x = 0; x < 1000; x += 40) {
         ctx.beginPath();
-        ctx.moveTo(0, 100);
-
-        for (let x = 0; x < canvas.width; x++) {
-            let y = 100 + Math.sin(x * 0.05) * 30;
-            if (x % 120 === 0) y = 30; // ECG spike simulation
-            ctx.lineTo(x, y);
-        }
-
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2;
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 350);
         ctx.stroke();
     }
 
+    for (let y = 0; y <= 350; y += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(1000, y);
+        ctx.stroke();
+    }
+
+    // Baseline
+    ctx.strokeStyle = "#333";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(startX, centerY);
+    ctx.lineTo(950, centerY);
+    ctx.stroke();
+
+    // ECG wave
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(startX, centerY);
+
+    // P
+    ctx.quadraticCurveTo(startX+40, centerY-40, startX+80, centerY);
+
+    // PR
+    ctx.lineTo(startX+140, centerY);
+
+    // Q
+    ctx.lineTo(startX+170, centerY+40);
+
+    // R
+    ctx.lineTo(startX+200, centerY-120);
+
+    // S
+    ctx.lineTo(startX+230, centerY+50);
+
+    // ST
+    ctx.lineTo(startX+300, centerY);
+
+    // T
+    ctx.quadraticCurveTo(startX+360, centerY-60, startX+430, centerY);
+
+    ctx.lineTo(950, centerY);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = "black";
+    ctx.font = "16px Arial";
+
+    ctx.fillText("P", startX+50, centerY-45);
+    ctx.fillText("Q", startX+165, centerY+70);
+    ctx.fillText("R", startX+195, centerY-130);
+    ctx.fillText("S", startX+225, centerY+85);
+    ctx.fillText("T", startX+380, centerY-65);
+}
 </script>
 
 </body>
