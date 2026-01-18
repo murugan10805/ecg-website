@@ -8,12 +8,12 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #0b1220;
+    background: #050b1a;
     color: white;
 }
 
 header {
-    background: #0f1b35;
+    background: #0b1533;
     padding: 15px;
     text-align: center;
     font-size: 22px;
@@ -26,7 +26,7 @@ header {
 }
 
 .box {
-    background: #121c35;
+    background: #0e1a3a;
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -60,6 +60,7 @@ button:hover {
 canvas {
     background: black;
     border-radius: 8px;
+    border: 2px solid #00ff00;
 }
 </style>
 </head>
@@ -133,8 +134,11 @@ const canvas = document.getElementById("ecgCanvas");
 const ctx = canvas.getContext("2d");
 
 let x = 0;
-let yBase = canvas.height / 2;
-let speed = 2;
+let t = 0;
+let running = false;
+
+const baseY = canvas.height / 2;
+const speed = 2;
 
 function drawGrid() {
     ctx.strokeStyle = "#003300";
@@ -155,37 +159,38 @@ function drawGrid() {
     }
 }
 
-let t = 0;
-
 function ecgWave(t) {
     return (
         0.6 * Math.exp(-Math.pow(t - 0.8, 2) / 0.02) -
         1.5 * Math.exp(-Math.pow(t - 1.6, 2) / 0.002) +
-        4.0 * Math.exp(-Math.pow(t - 1.7, 2) / 0.001) -
-        1.0 * Math.exp(-Math.pow(t - 1.85, 2) / 0.002) +
-        1.2 * Math.exp(-Math.pow(t - 3.0, 2) / 0.04)
+        4.5 * Math.exp(-Math.pow(t - 1.7, 2) / 0.001) -
+        1.2 * Math.exp(-Math.pow(t - 1.85, 2) / 0.002) +
+        1.5 * Math.exp(-Math.pow(t - 3.0, 2) / 0.04)
     );
 }
 
 function startECG() {
+    if (running) return;   // prevents double start bug
+
+    running = true;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid();
     x = 0;
     t = 0;
-    requestAnimationFrame(drawECG);
+    animateECG();
 }
 
-function drawECG() {
-    ctx.fillStyle = "rgba(0,0,0,0.1)";
+function animateECG() {
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    let y = yBase - ecgWave(t) * 50;
+    let y = baseY - ecgWave(t) * 55;
 
-    ctx.strokeStyle = "#00ff00";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#00ff00";   // bright green
+    ctx.lineWidth = 2.5;
 
     ctx.beginPath();
-    ctx.moveTo(x, yBase);
+    ctx.moveTo(x, baseY);
     ctx.lineTo(x + speed, y);
     ctx.stroke();
 
@@ -198,7 +203,7 @@ function drawECG() {
         drawGrid();
     }
 
-    requestAnimationFrame(drawECG);
+    requestAnimationFrame(animateECG);
 }
 </script>
 
