@@ -9,7 +9,6 @@ body {
     background: #f4f4f4;
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
 }
 
 header {
@@ -65,7 +64,6 @@ canvas {
     border: 2px solid #333;
     margin: 20px auto;
     display: block;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 </style>
 </head>
@@ -78,7 +76,7 @@ canvas {
 
 <div class="container">
 
-    <!-- Search Section -->
+    <!-- Search -->
     <div class="box">
         <h3>Search Patient</h3>
         <input type="text" id="name" placeholder="Enter Patient Name">
@@ -95,25 +93,21 @@ canvas {
         <p><b>Gender:</b> <span id="pgender"></span></p>
     </div>
 
-    <!-- ECG Output -->
+    <!-- ECG -->
     <div class="box hidden" id="ecgBox">
-        <h3>ECG Output (P–QRS–T Complex)</h3>
+        <h3>ECG Output (P-Q-R-S-T Complex)</h3>
         <canvas id="ecgCanvas" width="1000" height="350"></canvas>
     </div>
 
 </div>
 
 <script>
-/* ---------------- Patient Database ---------------- */
 const patients = [
     { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
     { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
-    { name: "Karthick", phone: "6380383481", age: 21, gender: "Male" },
-    { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" },
-    { name: "Roopashree", phone: "8610348470", age: 21, gender: "Female" }
+    { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" }
 ];
 
-/* ---------------- Search Function ---------------- */
 function searchPatient() {
     const name = document.getElementById("name").value.toLowerCase();
     const phone = document.getElementById("phone").value;
@@ -127,33 +121,28 @@ function searchPatient() {
         return;
     }
 
-    document.getElementById("patientBox").classList.remove("hidden");
-    document.getElementById("ecgBox").classList.remove("hidden");
+    patientBox.classList.remove("hidden");
+    ecgBox.classList.remove("hidden");
 
-    document.getElementById("pname").innerText = found.name;
-    document.getElementById("pphone").innerText = found.phone;
-    document.getElementById("page").innerText = found.age;
-    document.getElementById("pgender").innerText = found.gender;
+    pname.innerText = found.name;
+    pphone.innerText = found.phone;
+    page.innerText = found.age;
+    pgender.innerText = found.gender;
 
     drawECG();
 }
 
-/* ---------------- ECG Drawing ---------------- */
 function drawECG() {
     const canvas = document.getElementById("ecgCanvas");
     const ctx = canvas.getContext("2d");
 
     const centerY = 170;
-    const startX = 30;
-    const scaleX = 1.8;
-    const scaleY = 1.5;
+    const startX = 50;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Grid
     ctx.strokeStyle = "#e0e0e0";
-    ctx.lineWidth = 0.5;
-
     for (let x = 0; x < 1000; x += 40) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -170,41 +159,51 @@ function drawECG() {
 
     // Baseline
     ctx.strokeStyle = "#333";
-    ctx.lineWidth = 1.8;
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(startX, centerY);
-    ctx.lineTo(970, centerY);
+    ctx.lineTo(950, centerY);
     ctx.stroke();
 
-    // ECG waveform
-    ctx.strokeStyle = "#d32f2f";
-    ctx.lineWidth = 2.8;
+    // ECG wave
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(startX, centerY);
 
-    // P wave
-    ctx.bezierCurveTo(startX + 60, centerY - 35, startX + 100, centerY - 35, startX + 140, centerY);
+    // P
+    ctx.quadraticCurveTo(startX+40, centerY-40, startX+80, centerY);
 
-    // PR segment
-    ctx.lineTo(startX + 200, centerY);
+    // PR
+    ctx.lineTo(startX+140, centerY);
 
     // Q
-    ctx.lineTo(startX + 230, centerY + 30);
+    ctx.lineTo(startX+170, centerY+40);
 
     // R
-    ctx.lineTo(startX + 260, centerY - 100);
+    ctx.lineTo(startX+200, centerY-120);
 
     // S
-    ctx.lineTo(startX + 300, centerY + 40);
+    ctx.lineTo(startX+230, centerY+50);
 
-    // ST segment
-    ctx.lineTo(startX + 360, centerY);
+    // ST
+    ctx.lineTo(startX+300, centerY);
 
-    // T wave
-    ctx.bezierCurveTo(startX + 420, centerY - 50, startX + 480, centerY - 50, startX + 540, centerY);
+    // T
+    ctx.quadraticCurveTo(startX+360, centerY-60, startX+430, centerY);
 
-    ctx.lineTo(970, centerY);
+    ctx.lineTo(950, centerY);
     ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = "black";
+    ctx.font = "16px Arial";
+
+    ctx.fillText("P", startX+50, centerY-45);
+    ctx.fillText("Q", startX+165, centerY+70);
+    ctx.fillText("R", startX+195, centerY-130);
+    ctx.fillText("S", startX+225, centerY+85);
+    ctx.fillText("T", startX+380, centerY-65);
 }
 </script>
 
