@@ -73,6 +73,7 @@ canvas {
 
 <div class="container">
 
+    <!-- Search Section -->
     <div class="box">
         <h3>Search Patient</h3>
         <input type="text" id="name" placeholder="Enter Patient Name">
@@ -80,6 +81,7 @@ canvas {
         <button onclick="searchPatient()">Search</button>
     </div>
 
+    <!-- Patient Details -->
     <div class="box hidden" id="patientBox">
         <h3>Patient Details</h3>
         <p><b>Name:</b> <span id="pname"></span></p>
@@ -88,6 +90,7 @@ canvas {
         <p><b>Gender:</b> <span id="pgender"></span></p>
     </div>
 
+    <!-- ECG Graph -->
     <div class="box hidden" id="ecgBox">
         <h3>ECG Output</h3>
         <canvas id="ecgCanvas" width="800" height="200"></canvas>
@@ -98,48 +101,68 @@ canvas {
 <!-- JAVASCRIPT CODE -->
 <script>
 
-const patients = [
-    { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
-    { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
-    { name: "Karthick Prabhu", phone: "6380383481", age: 21, gender: "Male" },
-    { name: "Premnath", phone: "8778405776", age: 21, gender: "Male" },
-    { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" },
-    { name: "Roopashree", phone: "8610348470", age: 21, gender: "Female" },
-    { name: "Gowtham", phone: "6379267706", age: 21, gender: "Male" },
-    { name: "Priya", phone: "6381357576", age: 21, gender: "Female" },
-    { name: "Sathya", phone: "9790493422", age: 21, gender: "Female" },
-    { name: "Bharath Kumar", phone: "8610644691", age: 21, gender: "Male" }
-];
+    // NEW Patient Database (Only this list is used)
+    const patients = [
+        { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
+        { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
+        { name: "Karthick Prabhu", phone: "6380383481", age: 21, gender: "Male" },
+        { name: "Premnath", phone: "8778405776", age: 21, gender: "Male" },
+        { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" },
+        { name: "Roopashree", phone: "8610348470", age: 21, gender: "Female" },
+        { name: "Gowtham", phone: "6379267706", age: 21, gender: "Male" },
+        { name: "Priya", phone: "6381357576", age: 21, gender: "Female" },
+        { name: "Sathya", phone: "9790493422", age: 21, gender: "Female" },
+        { name: "Bharath Kumar", phone: "8610644691", age: 21, gender: "Male" }
+    ];
 
-function searchPatient() {
+    // Search Function
+    function searchPatient() {
 
-    let nameInput = document.getElementById("name").value.trim().toLowerCase();
-    let phoneInput = document.getElementById("phone").value.trim();
+        const nameInput = document.getElementById("name").value.trim().toLowerCase();
+        const phoneInput = document.getElementById("phone").value.trim();
 
-    let found = patients.find(p =>
-        (nameInput && p.name.toLowerCase().includes(nameInput)) ||
-        (phoneInput && p.phone.includes(phoneInput))
-    );
+        let found = patients.find(p =>
+            (nameInput && p.name.toLowerCase().includes(nameInput)) ||
+            (phoneInput && p.phone.includes(phoneInput))
+        );
 
-    if (!found) {
-        alert("Patient not found");
-        return;
+        if (!found) {
+            alert("Patient not found");
+            return;
+        }
+
+        document.getElementById("patientBox").classList.remove("hidden");
+        document.getElementById("ecgBox").classList.remove("hidden");
+
+        document.getElementById("pname").innerText = found.name;
+        document.getElementById("pphone").innerText = found.phone;
+        document.getElementById("page").innerText = found.age;
+        document.getElementById("pgender").innerText = found.gender;
+
+        drawECG();
     }
 
-    document.getElementById("patientBox").classList.remove("hidden");
-    document.getElementById("ecgBox").classList.remove("hidden");
+    // ECG Graph Function
+    function drawECG() {
+        const canvas = document.getElementById("ecgCanvas");
+        const ctx = canvas.getContext("2d");
 
-    pname.innerText = found.name;
-    pphone.innerText = found.phone;
-    page.innerText = found.age;
-    pgender.innerText = found.gender;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.moveTo(0, 100);
 
-    drawECG();
-}
+        for (let x = 0; x < canvas.width; x++) {
+            let y = 100 + Math.sin(x * 0.05) * 30;
+            if (x % 120 === 0) y = 30; // ECG spike simulation
+            ctx.lineTo(x, y);
+        }
 
-function drawECG() {
-    const canvas = document.getElementById("ecgCanvas");
-    const ctx = canvas.getContext("2d");
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginP
+</script>
+
+</body>
+</html>
