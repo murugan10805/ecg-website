@@ -2,18 +2,62 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Exact ECG Waveform</title>
+<title>Smart ECG Monitoring System</title>
 
 <style>
 body {
     background: #f4f4f4;
     font-family: Arial, sans-serif;
-    text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
-h2 {
-    margin-top: 20px;
-    color: #333;
+header {
+    background: #0a4d8c;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+input {
+    padding: 10px;
+    width: 250px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    background: #0a4d8c;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #083c6d;
+}
+
+.hidden {
+    display: none;
 }
 
 canvas {
@@ -28,94 +72,152 @@ canvas {
 
 <body>
 
-<h2>Precise ECG Waveform (P-QRS-T Complex)</h2>
+<header>
+    Smart ECG Monitoring System – Raspberry Pi 5
+</header>
 
-<canvas id="ecgCanvas" width="1000" height="350"></canvas>
+<div class="container">
+
+    <!-- Search Section -->
+    <div class="box">
+        <h3>Search Patient</h3>
+        <input type="text" id="name" placeholder="Enter Patient Name">
+        <input type="text" id="phone" placeholder="Enter Phone Number">
+        <button onclick="searchPatient()">Search</button>
+    </div>
+
+    <!-- Patient Details -->
+    <div class="box hidden" id="patientBox">
+        <h3>Patient Details</h3>
+        <p><b>Name:</b> <span id="pname"></span></p>
+        <p><b>Phone:</b> <span id="pphone"></span></p>
+        <p><b>Age:</b> <span id="page"></span></p>
+        <p><b>Gender:</b> <span id="pgender"></span></p>
+    </div>
+
+    <!-- ECG Output -->
+    <div class="box hidden" id="ecgBox">
+        <h3>ECG Output (P–QRS–T Complex)</h3>
+        <canvas id="ecgCanvas" width="1000" height="350"></canvas>
+    </div>
+
+</div>
 
 <script>
-const canvas = document.getElementById("ecgCanvas");
-const ctx = canvas.getContext("2d");
+// ---------------- Patient Database ----------------
+const patients = [
+    { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
+    { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
+    { name: "Karthick", phone: "6380383481", age: 21, gender: "Male" },
+    { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" },
+    { name: "Roopashree", phone: "8610348470", age: 21, gender: "Female" }
+];
 
-const centerY = 170;
-const startX = 30;
-const scaleX = 1.8;
-const scaleY = 1.5;
+// ---------------- Search Function ----------------
+function searchPatient() {
+    const name = document.getElementById("name").value.toLowerCase();
+    const phone = document.getElementById("phone").value;
 
-// Draw professional grid
-ctx.strokeStyle = "#e0e0e0";
-ctx.lineWidth = 0.5;
+    let found = patients.find(p =>
+        p.name.toLowerCase().includes(name) || p.phone.includes(phone)
+    );
 
-// Vertical grid lines
-for (let x = 0; x < 1000; x += 40) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, 350);
-    ctx.stroke();
+    if (!found) {
+        alert("Patient not found");
+        return;
+    }
+
+    document.getElementById("patientBox").classList.remove("hidden");
+    document.getElementById("ecgBox").classList.remove("hidden");
+
+    pname.innerText = found.name;
+    pphone.innerText = found.phone;
+    page.innerText = found.age;
+    pgender.innerText = found.gender;
+
+    drawECG();
 }
 
-// Horizontal grid lines
-for (let y = 0; y <= 350; y += 20) {
+// ---------------- ECG Drawing ----------------
+function drawECG() {
+    const canvas = document.getElementById("ecgCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const centerY = 170;
+    const startX = 30;
+    const scaleX = 1.8;
+    const scaleY = 1.5;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Grid
+    ctx.strokeStyle = "#e0e0e0";
+    ctx.lineWidth = 0.5;
+
+    for (let x = 0; x < 1000; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 350);
+        ctx.stroke();
+    }
+
+    for (let y = 0; y <= 350; y += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(1000, y);
+        ctx.stroke();
+    }
+
+    // Baseline
+    ctx.strokeStyle = "#333";
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(1000, y);
+    ctx.moveTo(startX, centerY);
+    ctx.lineTo(970, centerY);
+    ctx.stroke();
+
+    // ECG Waveform
+    ctx.strokeStyle = "#d32f2f";
+    ctx.lineWidth = 2.8;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(startX, centerY);
+
+    // P wave
+    ctx.bezierCurveTo(
+        startX + 35*scaleX, centerY - 18*scaleY,
+        startX + 65*scaleX, centerY - 28*scaleY,
+        startX + 95*scaleX, centerY - 3*scaleY
+    );
+
+    // PR segment
+    ctx.lineTo(startX + 165*scaleX, centerY);
+
+    // Q wave
+    ctx.lineTo(startX + 190*scaleX, centerY + 22*scaleY);
+
+    // R wave
+    ctx.lineTo(startX + 225*scaleX, centerY - 95*scaleY);
+
+    // S wave
+    ctx.lineTo(startX + 265*scaleX, centerY + 38*scaleY);
+
+    // ST segment
+    ctx.lineTo(startX + 320*scaleX, centerY + 3*scaleY);
+
+    // T wave
+    ctx.bezierCurveTo(
+        startX + 375*scaleX, centerY - 42*scaleY,
+        startX + 440*scaleX, centerY - 55*scaleY,
+        startX + 505*scaleX, centerY + 2*scaleY
+    );
+
+    // End baseline
+    ctx.lineTo(970, centerY);
+
     ctx.stroke();
 }
-
-// Draw thick baseline
-ctx.strokeStyle = "#333";
-ctx.lineWidth = 1.8;
-ctx.beginPath();
-ctx.moveTo(startX, centerY);
-ctx.lineTo(970, centerY);
-ctx.stroke();
-
-// ECG Waveform - EXACT physiological proportions
-ctx.strokeStyle = "#d32f2f";
-ctx.lineWidth = 2.8;
-ctx.lineJoin = "round";
-ctx.lineCap = "round";
-ctx.beginPath();
-ctx.moveTo(startX, centerY);
-
-// P wave - small rounded atrial depolarization (0.1mV, 80ms)
-ctx.bezierCurveTo(
-    startX + 35*scaleX, centerY - 18*scaleY,
-    startX + 65*scaleX, centerY - 28*scaleY,
-    startX + 95*scaleX, centerY - 3*scaleY
-);
-
-// PR segment - isoelectric line (120ms)
-ctx.lineTo(startX + 165*scaleX, centerY);
-
-// Q wave - small initial ventricular septal depolarization (-0.1 to -0.3mV, 40ms)
-ctx.lineTo(startX + 190*scaleX, centerY + 22*scaleY);
-
-// R wave - main ventricular depolarization (1.0-1.5mV, 80ms) - TALLEST peak
-ctx.lineTo(startX + 225*scaleX, centerY - 95*scaleY);
-
-// S wave - late ventricular depolarization (-0.2 to -0.5mV, 80ms)
-ctx.lineTo(startX + 265*scaleX, centerY + 38*scaleY);
-
-// ST segment - repolarization begins (80-120ms duration)
-ctx.lineTo(startX + 320*scaleX, centerY + 3*scaleY);
-
-// T wave - ventricular repolarization (0.2-0.4mV, 160ms) - ASYMMETRIC
-ctx.bezierCurveTo(
-    startX + 375*scaleX, centerY - 42*scaleY,
-    startX + 440*scaleX, centerY - 55*scaleY,
-    startX + 505*scaleX, centerY + 2*scaleY
-);
-
-// Return to baseline
-ctx.lineTo(970, centerY);
-
-ctx.stroke();
-
-// Add time/voltage labels
-ctx.fillStyle = "#666";
-ctx.font = "12px Arial";
-ctx.fillText("0.20s", 850, centerY + 18);
-ctx.fillText("1.0mV", 15, 75);
 </script>
 
 </body>
