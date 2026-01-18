@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Smart ECG Monitoring System</title>
 
-    <!-- CSS CODE -->
+    <!-- ========== CSS CODE ========== -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,6 +55,7 @@
         canvas {
             border: 1px solid #ccc;
             margin-top: 10px;
+            background-color: #fff;
         }
 
         .hidden {
@@ -65,7 +66,7 @@
 
 <body>
 
-<!-- HTML CODE -->
+<!-- ========== HTML CODE ========== -->
 <header>
     <h1>Smart ECG Monitoring System</h1>
     <p>Final Year Project - Raspberry Pi 5</p>
@@ -93,14 +94,14 @@
     <!-- ECG Graph -->
     <div class="box hidden" id="ecgBox">
         <h3>ECG Output</h3>
-        <canvas id="ecgCanvas" width="800" height="200"></canvas>
+        <canvas id="ecgCanvas" width="800" height="250"></canvas>
     </div>
 
 </div>
 
-<!-- JAVASCRIPT CODE -->
+<!-- ========== JAVASCRIPT CODE ========== -->
 <script>
-    // Sample patient data (Demo data)
+    // Demo Patient Data
     const patients = [
         { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
         { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
@@ -132,29 +133,78 @@
             document.getElementById("page").innerText = found.age;
             document.getElementById("pgender").innerText = found.gender;
 
-            drawECG();
+            startECG();
         } else {
             alert("Patient not found");
         }
     }
 
-    function drawECG() {
-        const canvas = document.getElementById("ecgCanvas");
-        const ctx = canvas.getContext("2d");
+    // ========== ECG ANIMATION ==========
+    const canvas = document.getElementById("ecgCanvas");
+    const ctx = canvas.getContext("2d");
+    const baseY = canvas.height / 2;
+    let xPos = 0;
+    let t = 0;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-        ctx.moveTo(0, 100);
-
-        for (let x = 0; x < canvas.width; x++) {
-            let y = 100 + Math.sin(x * 0.05) * 30;
-            if (x % 120 === 0) y = 30; // ECG spike simulation
-            ctx.lineTo(x, y);
+    function drawGrid() {
+        ctx.strokeStyle = "#eee";
+        for (let i = 0; i < canvas.width; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
         }
+
+        for (let i = 0; i < canvas.height; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.stroke();
+        }
+    }
+
+    function ecgWaveform(t) {
+        return (
+            0.8 * Math.exp(-Math.pow(t - 1, 2) / 0.02) -
+            1.5 * Math.exp(-Math.pow(t - 2, 2) / 0.002) +
+            4.5 * Math.exp(-Math.pow(t - 2.1, 2) / 0.001) -
+            1.2 * Math.exp(-Math.pow(t - 2.25, 2) / 0.002) +
+            1.8 * Math.exp(-Math.pow(t - 3.5, 2) / 0.04)
+        );
+    }
+
+    function startECG() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+        xPos = 0;
+        t = 0;
+        requestAnimationFrame(animateECG);
+    }
+
+    function animateECG() {
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        let y = baseY - ecgWaveform(t) * 40;
 
         ctx.strokeStyle = "red";
         ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(xPos, baseY);
+        ctx.lineTo(xPos + 2, y);
         ctx.stroke();
+
+        xPos += 2;
+        t += 0.05;
+
+        if (xPos >= canvas.width) {
+            xPos = 0;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+        }
+
+        requestAnimationFrame(animateECG);
     }
 </script>
 
