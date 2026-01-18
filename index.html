@@ -104,7 +104,7 @@ canvas {
 </div>
 
 <script>
-// ---------------- Patient Database ----------------
+/* ---------------- Patient Database ---------------- */
 const patients = [
     { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
     { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
@@ -113,7 +113,7 @@ const patients = [
     { name: "Roopashree", phone: "8610348470", age: 21, gender: "Female" }
 ];
 
-// ---------------- Search Function ----------------
+/* ---------------- Search Function ---------------- */
 function searchPatient() {
     const name = document.getElementById("name").value.toLowerCase();
     const phone = document.getElementById("phone").value;
@@ -130,15 +130,15 @@ function searchPatient() {
     document.getElementById("patientBox").classList.remove("hidden");
     document.getElementById("ecgBox").classList.remove("hidden");
 
-    pname.innerText = found.name;
-    pphone.innerText = found.phone;
-    page.innerText = found.age;
-    pgender.innerText = found.gender;
+    document.getElementById("pname").innerText = found.name;
+    document.getElementById("pphone").innerText = found.phone;
+    document.getElementById("page").innerText = found.age;
+    document.getElementById("pgender").innerText = found.gender;
 
     drawECG();
 }
 
-// ---------------- ECG Drawing ----------------
+/* ---------------- ECG Drawing ---------------- */
 function drawECG() {
     const canvas = document.getElementById("ecgCanvas");
     const ctx = canvas.getContext("2d");
@@ -176,46 +176,34 @@ function drawECG() {
     ctx.lineTo(970, centerY);
     ctx.stroke();
 
-    // ECG Waveform
+    // ECG waveform
     ctx.strokeStyle = "#d32f2f";
     ctx.lineWidth = 2.8;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(startX, centerY);
 
     // P wave
-    ctx.bezierCurveTo(
-        startX + 35*scaleX, centerY - 18*scaleY,
-        startX + 65*scaleX, centerY - 28*scaleY,
-        startX + 95*scaleX, centerY - 3*scaleY
-    );
+    ctx.bezierCurveTo(startX + 60, centerY - 35, startX + 100, centerY - 35, startX + 140, centerY);
 
     // PR segment
-    ctx.lineTo(startX + 165*scaleX, centerY);
+    ctx.lineTo(startX + 200, centerY);
 
-    // Q wave
-    ctx.lineTo(startX + 190*scaleX, centerY + 22*scaleY);
+    // Q
+    ctx.lineTo(startX + 230, centerY + 30);
 
-    // R wave
-    ctx.lineTo(startX + 225*scaleX, centerY - 95*scaleY);
+    // R
+    ctx.lineTo(startX + 260, centerY - 100);
 
-    // S wave
-    ctx.lineTo(startX + 265*scaleX, centerY + 38*scaleY);
+    // S
+    ctx.lineTo(startX + 300, centerY + 40);
 
     // ST segment
-    ctx.lineTo(startX + 320*scaleX, centerY + 3*scaleY);
+    ctx.lineTo(startX + 360, centerY);
 
     // T wave
-    ctx.bezierCurveTo(
-        startX + 375*scaleX, centerY - 42*scaleY,
-        startX + 440*scaleX, centerY - 55*scaleY,
-        startX + 505*scaleX, centerY + 2*scaleY
-    );
+    ctx.bezierCurveTo(startX + 420, centerY - 50, startX + 480, centerY - 50, startX + 540, centerY);
 
-    // End baseline
     ctx.lineTo(970, centerY);
-
     ctx.stroke();
 }
 </script>
