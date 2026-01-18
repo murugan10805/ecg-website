@@ -1,66 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Smart ECG Monitoring System</title>
+<meta charset="UTF-8">
+<title>Smart ECG Monitoring System</title>
 
-    <!-- CSS CODE -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-        }
+<!-- CSS CODE -->
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+}
 
-        header {
-            background-color: #0a4d8c;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
+header {
+    background-color: #0a4d8c;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
 
-        .container {
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-        }
+.container {
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+}
 
-        .box {
-            background: white;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+.box {
+    background: white;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
 
-        input {
-            padding: 10px;
-            width: 45%;
-            margin: 5px 0;
-        }
+input {
+    padding: 10px;
+    width: 45%;
+    margin: 5px 0;
+}
 
-        button {
-            padding: 10px 20px;
-            background-color: #0a4d8c;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+button {
+    padding: 10px 20px;
+    background-color: #0a4d8c;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
 
-        button:hover {
-            background-color: #083c6d;
-        }
+button:hover {
+    background-color: #083c6d;
+}
 
-        canvas {
-            border: 1px solid #ccc;
-            margin-top: 10px;
-        }
+canvas {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
 
-        .hidden {
-            display: none;
-        }
-    </style>
+.hidden {
+    display: none;
+}
+</style>
 </head>
 
 <body>
@@ -74,7 +73,6 @@
 
 <div class="container">
 
-    <!-- Search Section -->
     <div class="box">
         <h3>Search Patient</h3>
         <input type="text" id="name" placeholder="Enter Patient Name">
@@ -82,7 +80,6 @@
         <button onclick="searchPatient()">Search</button>
     </div>
 
-    <!-- Patient Details -->
     <div class="box hidden" id="patientBox">
         <h3>Patient Details</h3>
         <p><b>Name:</b> <span id="pname"></span></p>
@@ -91,7 +88,6 @@
         <p><b>Gender:</b> <span id="pgender"></span></p>
     </div>
 
-    <!-- ECG Graph -->
     <div class="box hidden" id="ecgBox">
         <h3>ECG Output</h3>
         <canvas id="ecgCanvas" width="800" height="200"></canvas>
@@ -102,41 +98,48 @@
 <!-- JAVASCRIPT CODE -->
 <script>
 
-    // Demo Patient Database
-    const patients = [
-        { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
-        { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
-        { name: "Karthick Prabhu", phone: "6380383481", age: 21, gender: "Male" },
-        { name: "Premnath", phone: "8778405776", age: 21, gender: "Male" },
-        { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" },
-        { name: "Roopashree", phone: "8610348470", age: 21, gender: "Female" },
-        { name: "Gowtham", phone: "6379267706", age: 21, gender: "Male" },
-        { name: "Priya", phone: "6381357576", age: 21, gender: "Female" },
-        { name: "Sathya", phone: "9790493422", age: 21, gender: "Female" },
-        { name: "Bharath Kumar", phone: "8610644691", age: 21, gender: "Male" }
-    ];
+const patients = [
+    { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
+    { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
+    { name: "Karthick Prabhu", phone: "6380383481", age: 21, gender: "Male" },
+    { name: "Premnath", phone: "8778405776", age: 21, gender: "Male" },
+    { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" },
+    { name: "Roopashree", phone: "8610348470", age: 21, gender: "Female" },
+    { name: "Gowtham", phone: "6379267706", age: 21, gender: "Male" },
+    { name: "Priya", phone: "6381357576", age: 21, gender: "Female" },
+    { name: "Sathya", phone: "9790493422", age: 21, gender: "Female" },
+    { name: "Bharath Kumar", phone: "8610644691", age: 21, gender: "Male" }
+];
 
-    // Search Function
-    function searchPatient() {
+function searchPatient() {
 
-        const nameInput = document.getElementById("name").value.trim().toLowerCase();
-        const phoneInput = document.getElementById("phone").value.trim();
+    let nameInput = document.getElementById("name").value.trim().toLowerCase();
+    let phoneInput = document.getElementById("phone").value.trim();
 
-        let found = patients.find(p => {
-            return (
-                (nameInput !== "" && p.name.toLowerCase().includes(nameInput)) ||
-                (phoneInput !== "" && p.phone.includes(phoneInput))
-            );
-        });
+    let found = patients.find(p =>
+        (nameInput && p.name.toLowerCase().includes(nameInput)) ||
+        (phoneInput && p.phone.includes(phoneInput))
+    );
 
-        if (!found) {
-            alert("Patient not found");
-            return;
-        }
+    if (!found) {
+        alert("Patient not found");
+        return;
+    }
 
-        document.getElementById("patientBox").classList.remove("hidden");
-        document.getElementById("ecgBox").classList.remove("hidden");
+    document.getElementById("patientBox").classList.remove("hidden");
+    document.getElementById("ecgBox").classList.remove("hidden");
 
-        document.getElementById("pname").innerText = found.name;
-        document.getElementById("pphone").innerText = found.phone;
-        document.getElementById("page").innerTe
+    pname.innerText = found.name;
+    pphone.innerText = found.phone;
+    page.innerText = found.age;
+    pgender.innerText = found.gender;
+
+    drawECG();
+}
+
+function drawECG() {
+    const canvas = document.getElementById("ecgCanvas");
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginP
