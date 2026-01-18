@@ -2,209 +2,78 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Smart ECG Monitoring System</title>
+<title>ECG Waveform</title>
 
 <style>
 body {
-    margin: 0;
+    background: #f4f4f4;
     font-family: Arial, sans-serif;
-    background: #050b1a;
-    color: white;
-}
-
-header {
-    background: #0b1533;
-    padding: 15px;
     text-align: center;
-    font-size: 22px;
-    font-weight: bold;
 }
 
-.container {
-    width: 1000px;
-    margin: 20px auto;
-}
-
-.box {
-    background: #0e1a3a;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
-input {
-    padding: 10px;
-    width: 250px;
-    border-radius: 5px;
-    border: none;
-    margin-right: 10px;
-}
-
-button {
-    padding: 10px 20px;
-    background: #1f8ef1;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #0d6efd;
-}
-
-.hidden {
-    display: none;
+h2 {
+    margin-top: 20px;
 }
 
 canvas {
-    background: black;
-    border-radius: 8px;
-    border: 2px solid #00ff00;
+    background: white;
+    border: 2px solid #000;
+    margin-top: 20px;
 }
 </style>
 </head>
 
 <body>
 
-<header>Smart ECG Monitoring System - Raspberry Pi 5</header>
+<h2>ECG Waveform (P-QRS-T Complex)</h2>
 
-<div class="container">
-
-    <!-- Search -->
-    <div class="box">
-        <h3>Search Patient</h3>
-        <input type="text" id="name" placeholder="Patient Name">
-        <input type="text" id="phone" placeholder="Phone Number">
-        <button onclick="searchPatient()">Search</button>
-    </div>
-
-    <!-- Patient -->
-    <div class="box hidden" id="patientBox">
-        <h3>Patient Details</h3>
-        <p>Name: <span id="pname"></span></p>
-        <p>Phone: <span id="pphone"></span></p>
-        <p>Age: <span id="page"></span></p>
-        <p>Gender: <span id="pgender"></span></p>
-    </div>
-
-    <!-- ECG -->
-    <div class="box hidden" id="ecgBox">
-        <h3>Live ECG Monitor</h3>
-        <canvas id="ecgCanvas" width="950" height="300"></canvas>
-    </div>
-
-</div>
+<canvas id="ecgCanvas" width="900" height="300"></canvas>
 
 <script>
-const patients = [
-    { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
-    { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
-    { name: "Mathumitha", phone: "8610275836", age: 21, gender: "Female" }
-];
-
-function searchPatient() {
-    const name = document.getElementById("name").value.toLowerCase();
-    const phone = document.getElementById("phone").value;
-
-    let found = patients.find(p =>
-        p.name.toLowerCase().includes(name) || p.phone.includes(phone)
-    );
-
-    if (!found) {
-        alert("Patient not found");
-        return;
-    }
-
-    document.getElementById("patientBox").classList.remove("hidden");
-    document.getElementById("ecgBox").classList.remove("hidden");
-
-    pname.innerText = found.name;
-    pphone.innerText = found.phone;
-    page.innerText = found.age;
-    pgender.innerText = found.gender;
-
-    startECG();
-}
-
-
-/* ================= ECG MONITOR ================= */
-
 const canvas = document.getElementById("ecgCanvas");
 const ctx = canvas.getContext("2d");
 
-let x = 0;
-let t = 0;
-let running = false;
+const baseY = 150;
 
-const baseY = canvas.height / 2;
-const speed = 2;
+// Draw baseline
+ctx.beginPath();
+ctx.moveTo(20, baseY);
+ctx.lineTo(880, baseY);
+ctx.strokeStyle = "black";
+ctx.lineWidth = 2;
+ctx.stroke();
 
-function drawGrid() {
-    ctx.strokeStyle = "#003300";
-    ctx.lineWidth = 1;
+// ECG Waveform Path
+ctx.beginPath();
+ctx.moveTo(20, baseY);
 
-    for (let i = 0; i < canvas.width; i += 40) {
-        ctx.beginPath();
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, canvas.height);
-        ctx.stroke();
-    }
+// P wave
+ctx.quadraticCurveTo(70, baseY - 40, 120, baseY);
 
-    for (let i = 0; i < canvas.height; i += 40) {
-        ctx.beginPath();
-        ctx.moveTo(0, i);
-        ctx.lineTo(canvas.width, i);
-        ctx.stroke();
-    }
-}
+// PR segment
+ctx.lineTo(170, baseY);
 
-function ecgWave(t) {
-    return (
-        0.6 * Math.exp(-Math.pow(t - 0.8, 2) / 0.02) -
-        1.5 * Math.exp(-Math.pow(t - 1.6, 2) / 0.002) +
-        4.5 * Math.exp(-Math.pow(t - 1.7, 2) / 0.001) -
-        1.2 * Math.exp(-Math.pow(t - 1.85, 2) / 0.002) +
-        1.5 * Math.exp(-Math.pow(t - 3.0, 2) / 0.04)
-    );
-}
+// Q wave
+ctx.lineTo(200, baseY + 30);
 
-function startECG() {
-    if (running) return;   // prevents double start bug
+// R wave
+ctx.lineTo(230, baseY - 100);
 
-    running = true;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawGrid();
-    x = 0;
-    t = 0;
-    animateECG();
-}
+// S wave
+ctx.lineTo(260, baseY + 40);
 
-function animateECG() {
-    ctx.fillStyle = "rgba(0,0,0,0.08)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+// ST segment
+ctx.lineTo(330, baseY);
 
-    let y = baseY - ecgWave(t) * 55;
+// T wave
+ctx.quadraticCurveTo(400, baseY - 60, 480, baseY);
 
-    ctx.strokeStyle = "#00ff00";   // bright green
-    ctx.lineWidth = 2.5;
+// Back to baseline
+ctx.lineTo(880, baseY);
 
-    ctx.beginPath();
-    ctx.moveTo(x, baseY);
-    ctx.lineTo(x + speed, y);
-    ctx.stroke();
-
-    x += speed;
-    t += 0.05;
-
-    if (x >= canvas.width) {
-        x = 0;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawGrid();
-    }
-
-    requestAnimationFrame(animateECG);
-}
+ctx.strokeStyle = "red";
+ctx.lineWidth = 3;
+ctx.stroke();
 </script>
 
 </body>
