@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ECG Waveform</title>
+<title>ECG Waveform Improved</title>
 
 <style>
 body {
@@ -34,45 +34,65 @@ const canvas = document.getElementById("ecgCanvas");
 const ctx = canvas.getContext("2d");
 
 const baseY = 150;
+const startX = 20;
+
+// Draw thin grid for realism
+ctx.strokeStyle = "#ddd";
+ctx.lineWidth = 1;
+for (let x = 0; x < 900; x += 50) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 300);
+    ctx.stroke();
+}
+for (let y = 0; y < 300; y += 25) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(900, y);
+    ctx.stroke();
+}
 
 // Draw baseline
-ctx.beginPath();
-ctx.moveTo(20, baseY);
-ctx.lineTo(880, baseY);
 ctx.strokeStyle = "black";
-ctx.lineWidth = 2;
+ctx.lineWidth = 1.5;
+ctx.beginPath();
+ctx.moveTo(startX, baseY);
+ctx.lineTo(880, baseY);
 ctx.stroke();
 
-// ECG Waveform Path
+// ECG Waveform Path - improved for realistic shape
 ctx.beginPath();
-ctx.moveTo(20, baseY);
+ctx.moveTo(startX, baseY);
 
-// P wave
-ctx.quadraticCurveTo(70, baseY - 40, 120, baseY);
+// P wave - smoother, smaller hump
+ctx.quadraticCurveTo(startX + 50, baseY - 30, startX + 100, baseY - 5);
 
-// PR segment
-ctx.lineTo(170, baseY);
+// PR segment - flat
+ctx.lineTo(startX + 160, baseY);
 
-// Q wave
-ctx.lineTo(200, baseY + 30);
+// Q wave - sharper small downward
+ctx.lineTo(startX + 180, baseY + 20);
 
-// R wave
-ctx.lineTo(230, baseY - 100);
+// R wave - tall peak
+ctx.lineTo(startX + 210, baseY - 85);
 
-// S wave
-ctx.lineTo(260, baseY + 40);
+// S wave - deeper notch
+ctx.lineTo(startX + 245, baseY + 35);
 
-// ST segment
-ctx.lineTo(330, baseY);
+// ST segment - slight elevation
+ctx.lineTo(startX + 290, baseY - 8);
 
-// T wave
-ctx.quadraticCurveTo(400, baseY - 60, 480, baseY);
+// T wave - asymmetric, gradual rise sharp fall
+ctx.quadraticCurveTo(startX + 360, baseY - 45, startX + 430, baseY - 5);
+ctx.lineTo(startX + 460, baseY);
 
-// Back to baseline
+// Continue baseline
 ctx.lineTo(880, baseY);
 
 ctx.strokeStyle = "red";
 ctx.lineWidth = 3;
+ctx.lineJoin = "round";
+ctx.lineCap = "round";
 ctx.stroke();
 </script>
 
