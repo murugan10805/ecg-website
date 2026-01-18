@@ -102,7 +102,7 @@
 <!-- JAVASCRIPT CODE -->
 <script>
 
-    // NEW Patient Database (only this list)
+    // Patient Database
     const patients = [
         { name: "Murugan", phone: "9150387820", age: 21, gender: "Male" },
         { name: "Jawahar", phone: "7604985592", age: 21, gender: "Male" },
@@ -125,35 +125,61 @@
             p.phone.includes(phoneInput)
         );
 
-        if (found) {
-            document.getElementById("patientBox").classList.remove("hidden");
-            document.getElementById("ecgBox").classList.remove("hidden");
-
-            document.getElementById("pname").innerText = found.name;
-            document.getElementById("pphone").innerText = found.phone;
-            document.getElementById("page").innerText = found.age;
-            document.getElementById("pgender").innerText = found.gender;
-
-            drawECG();   // OLD waveform function
-        } else {
+        if (!found) {
             alert("Patient not found");
+            return;
         }
+
+        document.getElementById("patientBox").classList.remove("hidden");
+        document.getElementById("ecgBox").classList.remove("hidden");
+
+        pname.innerText = found.name;
+        pphone.innerText = found.phone;
+        page.innerText = found.age;
+        pgender.innerText = found.gender;
+
+        drawECG();
     }
 
-    // SAME OLD ECG WAVEFORM (not changed)
+    // ECG P-Q-R-S-T Waveform
     function drawECG() {
         const canvas = document.getElementById("ecgCanvas");
         const ctx = canvas.getContext("2d");
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-        ctx.moveTo(0, 100);
 
-        for (let x = 0; x < canvas.width; x++) {
-            let y = 100 + Math.sin(x * 0.05) * 30;
-            if (x % 120 === 0) y = 30; // ECG spike simulation
-            ctx.lineTo(x, y);
-        }
+        const baseY = 100;
+        let x = 20;
+
+        ctx.beginPath();
+        ctx.moveTo(x, baseY);
+
+        // Baseline
+        ctx.lineTo(x + 40, baseY);
+
+        // P wave
+        ctx.quadraticCurveTo(x + 60, baseY - 25, x + 80, baseY);
+
+        // PR segment
+        ctx.lineTo(x + 120, baseY);
+
+        // Q wave
+        ctx.lineTo(x + 140, baseY + 20);
+
+        // R wave
+        ctx.lineTo(x + 160, baseY - 80);
+
+        // S wave
+        ctx.lineTo(x + 180, baseY + 30);
+
+        // ST segment
+        ctx.lineTo(x + 230, baseY);
+
+        // T wave
+        ctx.quadraticCurveTo(x + 270, baseY - 40, x + 320, baseY);
+
+        // Continue baseline
+        ctx.lineTo(780, baseY);
 
         ctx.strokeStyle = "red";
         ctx.lineWidth = 2;
